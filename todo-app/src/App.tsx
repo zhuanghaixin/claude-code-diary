@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface Todo {
   id: number
@@ -7,7 +7,10 @@ interface Todo {
 }
 
 function App() {
-  const [todos, setTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Todo[]>(()=>{
+    const saved=localStorage.getItem('todos')
+    return saved ? JSON.parse(saved) : []
+  })
   const [inputValue, setInputValue] = useState('')
 
   const addTodo = () => {
@@ -25,6 +28,14 @@ function App() {
   const deleteTodo = (id: number) => {
     setTodos(todos.filter(todo => todo.id !== id))
   }
+
+  // 保存到 localStorage
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
+
+
+
 
   return (
     <div className="app">
