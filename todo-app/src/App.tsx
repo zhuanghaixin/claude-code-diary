@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 interface Todo {
   id: number
@@ -40,6 +40,20 @@ function App() {
   const percentage = total > 0 ? (completed / total) * 100 : 0
 
 
+  // 筛选功能
+  const [filter, setFilter] = useState<('all' | 'active' | 'completed')>('all')
+  const filteredTodos = useMemo(() => {
+    switch (filter) {
+      case 'all':
+        return todos
+      case 'active':
+        return todos.filter(todo => !todo.completed)
+      case 'completed':
+        return todos.filter(todo => todo.completed)
+    }
+  }, [todos, filter])
+
+
   return (
     <div className="app">
       <h1>Todo List</h1>
@@ -51,6 +65,11 @@ function App() {
         <span>完成: {completed}</span>
         <span>{percentage.toFixed(0)}%</span>
       </div>
+      <div className="filter">
+        <button onClick={() => setFilter('all')}>全部</button>
+        <button onClick={() => setFilter('active')}>进行中</button>
+        <button onClick={() => setFilter('completed')}>已完成</button>
+      </div>
       <div className="add-todo">
         <input
           value={inputValue}
@@ -61,7 +80,7 @@ function App() {
         <button onClick={addTodo}>添加</button>
       </div>
       <ul className="todo-list">
-        {todos.map(todo => (
+        {filteredTodos.map(todo => (  
           <li key={todo.id} className={todo.completed ? 'completed' : ''}>
             <span onClick={() => toggleTodo(todo.id)}>{todo.text}</span>
             <button onClick={() => deleteTodo(todo.id)}>删除</button>
