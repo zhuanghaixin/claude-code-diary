@@ -27,6 +27,28 @@ h1 {
   color: #333;
 }
 
+.progress-bar {
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a90d9, #67b26f);
+  transition: width 0.3s ease;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
 .add-todo {
   display: flex;
   gap: 10px;

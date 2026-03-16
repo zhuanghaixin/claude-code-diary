@@ -35,11 +35,22 @@ function App() {
   }, [todos])
 
 
+  const total = todos.length
+  const completed = todos.filter(todo => todo.completed).length
+  const percentage = total > 0 ? (completed / total) * 100 : 0
 
 
   return (
     <div className="app">
       <h1>Todo List</h1>
+      <div className="progress-bar">
+        <div className="progress-bar-fill" style={{ width: `${percentage}%` }}></div>
+      </div>
+      <div className="stats">
+        <span>总计: {total}</span>
+        <span>完成: {completed}</span>
+        <span>{percentage.toFixed(0)}%</span>
+      </div>
       <div className="add-todo">
         <input
           value={inputValue}
