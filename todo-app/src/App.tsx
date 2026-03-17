@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 
 interface Todo {
   id: number
@@ -8,26 +8,31 @@ interface Todo {
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>(()=>{
-    const saved=localStorage.getItem('todos')
-    return saved ? JSON.parse(saved) : []
+    try {
+      const saved = localStorage.getItem('todos')
+      const parsed = saved ? JSON.parse(saved) : []
+      return Array.isArray(parsed) ? parsed : []
+    } catch {
+      return []
+    }
   })
   const [inputValue, setInputValue] = useState('')
 
-  const addTodo = () => {
+  const addTodo = useCallback(() => {
     if (!inputValue.trim()) return
-    setTodos([...todos, { id: Date.now(), text: inputValue, completed: false }])
+    setTodos(prev => [...prev, { id: Date.now(), text: inputValue, completed: false }])
     setInputValue('')
-  }
+  }, [inputValue])
 
-  const toggleTodo = (id: number) => {
-    setTodos(todos.map(todo =>
+  const toggleTodo = useCallback((id: number) => {
+    setTodos(prev => prev.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ))
-  }
+  }, [])
 
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter(todo => todo.id !== id))
-  }
+  const deleteTodo = useCallback((id: number) => {
+    setTodos(prev => prev.filter(todo => todo.id !== id))
+  }, [])
 
   // 保存到 localStorage
   useEffect(() => {
@@ -35,9 +40,16 @@ function App() {
   }, [todos])
 
 
-  const total = todos.length
-  const completed = todos.filter(todo => todo.completed).length
-  const percentage = total > 0 ? (completed / total) * 100 : 0
+  // 统计数据（用 useMemo 缓存）
+  const { total, completed, percentage } = useMemo(() => {
+    const t = todos.length
+    const c = todos.filter(todo => todo.completed).length
+    return {
+      total: t,
+      completed: c,
+      percentage: t > 0 ? (c / t) * 100 : 0
+    }
+  }, [todos])
 
 
   // 筛选功能
